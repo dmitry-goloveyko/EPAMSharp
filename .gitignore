@@ -1,0 +1,10 @@
+.nuget/
+packages/
+*.sln
+*.suo
+bin/
+obj/
+Properties/
+*.config
+*.csproj
+*.user
