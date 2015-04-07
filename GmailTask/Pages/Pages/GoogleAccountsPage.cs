@@ -9,7 +9,7 @@ using Driver;
 
 namespace Pages
 {
-    public class GoogleAccountsPage : AbstractPage
+    public class GoogleAccountsPage : GooglePage, IOpenable
     {
         private const string PAGE_URL = "http://accounts.google.com";
 
@@ -31,37 +31,16 @@ namespace Pages
         }
 
         
-        override public void OpenPage()
+        
+        public void OpenPage()
         {
             webDriver.Navigate().GoToUrl(PAGE_URL);
         }
 
-        public void LoginAsUser1()
+        public void Login(String login, String password)
         {
-            emailInput.WaitUntilVisible().SendKeys(UserCredentials.LOGIN1);
-            passwordInput.SendKeys(UserCredentials.PASSWORD1);
-            if (staySignedInCheckBox.Selected)
-            {
-                staySignedInCheckBox.Click();
-            }
-            signInButton.Click();
-        }
-
-        public void LoginAsUser2()
-        {
-            emailInput.WaitUntilVisible().SendKeys(UserCredentials.LOGIN2);
-            passwordInput.SendKeys(UserCredentials.PASSWORD2);
-            if (staySignedInCheckBox.Selected)
-            {
-                staySignedInCheckBox.Click();
-            }
-            signInButton.Click();
-        }
-
-        public void LoginAsUser3()
-        {
-            emailInput.WaitUntilVisible().SendKeys(UserCredentials.LOGIN3);
-            passwordInput.SendKeys(UserCredentials.PASSWORD3);
+            emailInput.WaitUntilVisible().SendKeys(login);
+            passwordInput.SendKeys(password);
             if (staySignedInCheckBox.Selected)
             {
                 staySignedInCheckBox.Click();

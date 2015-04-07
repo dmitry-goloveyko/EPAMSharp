@@ -12,9 +12,5 @@ namespace Pages
     public abstract class AbstractPage
     {
         protected static IWebDriver webDriver = Driver.Driver.getDriver();
-        public abstract void OpenPage();
-
     }
-
-
 }
