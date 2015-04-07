@@ -12,8 +12,10 @@ namespace Driver
     public static class Wait
     {
 
-        public static IWebElement WaitUntilVisible(this IWebElement element, TimeSpan timeOut)
+        public static IWebElement WaitUntilVisible(this IWebElement element, int timeoutSeconds)
         {
+            TimeSpan timeOut = TimeSpan.FromSeconds(timeoutSeconds);
+
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
@@ -42,7 +44,42 @@ namespace Driver
 
         public static IWebElement WaitUntilVisible(this IWebElement element)
         {
-            return WaitUntilVisible(element, TimeSpan.FromSeconds(10));
+            return WaitUntilVisible(element, 10);
+        }
+
+        public static IWebElement WaitUntilPresent(this IWebElement element, int timeoutSeconds)
+        {
+            TimeSpan timeOut = TimeSpan.FromSeconds(timeoutSeconds);
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            while (true)
+            {
+                Exception lastException = null;
+                try
+                {
+                    if (element.FindElements(By.XPath("//.")).ToList().Count > 0)
+                    {
+                        return element;
+                    }
+                    System.Threading.Thread.Sleep(100);
+                }
+                catch (Exception e) { lastException = e; }
+
+                if (sw.Elapsed > timeOut)
+                {
+                    string exceptionMessage = lastException == null ? "" : lastException.Message;
+                    string errorMessage = string.Format("Wait.UntilVisible: Element was not displayed after {0} Milliseconds" +
+                                                        "\r\n Error Message:\r\n{1}", timeOut.TotalMilliseconds, exceptionMessage);
+                    throw new TimeoutException(errorMessage);
+                }
+            }
+        }
+
+        public static IWebElement WaitUntilPresent(this IWebElement element)
+        {
+            return WaitUntilPresent(element, 10);
         }
     }
 }
