@@ -8,3 +8,4 @@ Properties/
 *.config
 *.csproj
 *.user
+Test/
