@@ -10,15 +10,11 @@ using OpenQA.Selenium.Interactions;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
 namespace Pages
 {
     public class ComposeLetterWindow : GmailPage
     {
-        [DllImport("user32.dll")]
-        public static extern int SetForegroundWindow(IntPtr hWnd);
-
         [FindsBy(How = How.Name, Using = "to")]
         private IWebElement recipientsTextArea;
 
@@ -31,35 +27,28 @@ namespace Pages
         [FindsBy(How = How.XPath, Using = "//*[contains(text(),'Send')]")]
         private IWebElement sendEmailButton;
 
-        [FindsBy(How = How.XPath, Using = "//*[@data-tooltip='Attach files'")]
-        private IWebElement attachFilesButton;
-
         [FindsBy(How = How.XPath, Using = "//button[@name='cancel']")]
         private IWebElement cancelButton;
+
+        [FindsBy(How = How.XPath, Using = "//*[@data-tooltip='Attach files']")]
+        private IWebElement attachFilesButton;
+
+        [FindsBy(How = How.XPath, Using = "//*[@data-tooltip='Insert emoticon ‪(Ctrl-Shift-2)‬']")]
+        private IWebElement insertEmoticonsButton;
+
+        [FindsBy(How = How.XPath, Using = "//div[@role='button' and text() = 'Insert']")]
+        private IWebElement insertEmoticonsToTextareaButton;
+
+        [FindsBy(How = How.XPath, Using = "//*[@data-tooltip='Save & Close']")]
+        private IWebElement closeWindowButton;
+        
+        [FindsBy(How = How.XPath, Using = "//*[text() = 'The file you are trying to send " + 
+            "exceeds the 25MB attachment limit.'")]
+        private IWebElement tooBigFileErrorMessage;
 
         public ComposeLetterWindow()
         {
             PageFactory.InitElements(webDriver, this);
-        }
-
-        public void SetRecipient(String recipient) 
-        {
-            recipientsTextArea.SendKeys(recipient);
-        }
-
-        public void SetSubject(String subject)
-        {
-            subjectInput.SendKeys(subject);
-        }
-
-        public void SetMessage(String message)
-        {
-            textInput.SendKeys(message);
-        }
-
-        public void ClickSendButton()
-        {
-            sendEmailButton.Click();
         }
 
         public void WriteLetter(String recipient, String subject, String text)
@@ -70,29 +59,74 @@ namespace Pages
             sendEmailButton.Click();
         }
 
-        public bool AttachFile(String absolutePath)
+        public bool WriteLetterWithLargeFile(String recipient, String subject, String text, String absoluteFilePath)
         {
-            System.Threading.Thread.Sleep(1000);
-            webDriver.FindElement(By.XPath("//*[@data-tooltip='Attach files']")).Click();
+            recipientsTextArea.SendKeys(recipient);
+            subjectInput.SendKeys(subject);
+            textInput.SendKeys(text);
 
-            SendKeys.SendWait(absolutePath);
-            System.Threading.Thread.Sleep(1000);
-            SendKeys.SendWait("{TAB}");
-            System.Threading.Thread.Sleep(1000);
-            SendKeys.SendWait("{TAB}");
-            System.Threading.Thread.Sleep(1000);
-            SendKeys.SendWait("{ENTER}");
-            System.Threading.Thread.Sleep(1000);
-
-            String errorMessage = "The file you are trying to send exceeds the 25MB attachment limit.";
-
-            if (webDriver.FindElements(By.XPath("//*[text() = '" + errorMessage + "']")).ToList().Count > 0)
+            if (!AttachFile(absoluteFilePath))
             {
-                cancelButton.Click();
+                closeWindowButton.WaitUntilPresent().Click();
                 return false;
             }
 
+            sendEmailButton.Click();
+
             return true;
+        }
+
+        public void WriteLetterWithEmoticons(String recipient, String subject, String text, List<String> emoticonsGoomojiAttributes)
+        {
+            recipientsTextArea.SendKeys(recipient);
+            subjectInput.SendKeys(subject);
+            textInput.SendKeys(text);
+
+            InsertEmoticons(emoticonsGoomojiAttributes);
+
+            sendEmailButton.Click();
+        }
+
+        private bool AttachFile(String absolutePath)
+        {
+            attachFilesButton.WaitUntilPresent().Click();
+
+            System.Windows.Forms.SendKeys.SendWait(absolutePath);
+            System.Threading.Thread.Sleep(1000);
+            System.Windows.Forms.SendKeys.SendWait("{TAB}");
+            System.Threading.Thread.Sleep(1000);
+            System.Windows.Forms.SendKeys.SendWait("{TAB}");
+            System.Threading.Thread.Sleep(1000);
+            System.Windows.Forms.SendKeys.SendWait("{ENTER}");
+
+            try
+            {
+                cancelButton.WaitUntilPresent().Click();
+            }
+            catch (TimeoutException)
+            {
+                return true;
+            }
+            
+            return false;
+        }
+
+        private void InsertEmoticons(List<String> emoticonsGoomojiAttributes)
+        {
+            insertEmoticonsButton.WaitUntilPresent().Click();
+
+            //adding multiple emoticons
+            Actions action = new Actions(webDriver);
+            action.KeyDown(Keys.Shift).Perform();
+
+            foreach (var goomoji in emoticonsGoomojiAttributes)
+	        {
+                webDriver.FindElement(By.XPath("//div[@goomoji='" + goomoji + "']")).WaitUntilPresent().Click();
+	        }
+
+            action.KeyUp(Keys.Shift).Perform();
+
+            insertEmoticonsToTextareaButton.WaitUntilPresent().Click();
         }
     }
 }

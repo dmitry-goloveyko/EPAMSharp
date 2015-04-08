@@ -54,15 +54,20 @@ namespace Driver
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
+            IWebElement elem = null;
+
             while (true)
             {
                 Exception lastException = null;
                 try
                 {
-                    if (element.FindElements(By.XPath("//.")).ToList().Count > 0)
+                    elem = element.FindElement(By.XPath("."));
+
+                    if (elem != null)
                     {
                         return element;
                     }
+
                     System.Threading.Thread.Sleep(100);
                 }
                 catch (Exception e) { lastException = e; }
@@ -70,7 +75,7 @@ namespace Driver
                 if (sw.Elapsed > timeOut)
                 {
                     string exceptionMessage = lastException == null ? "" : lastException.Message;
-                    string errorMessage = string.Format("Wait.UntilVisible: Element was not displayed after {0} Milliseconds" +
+                    string errorMessage = string.Format("Wait.UntilPresent: Element was not presenet after {0} Milliseconds" +
                                                         "\r\n Error Message:\r\n{1}", timeOut.TotalMilliseconds, exceptionMessage);
                     throw new TimeoutException(errorMessage);
                 }
