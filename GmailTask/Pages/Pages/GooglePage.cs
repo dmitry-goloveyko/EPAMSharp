@@ -17,10 +17,10 @@ namespace Pages
         [FindsBy(How = How.LinkText, Using = "Sign out")]
         private IWebElement exitAccountButton;
 
-        public void Unlogin()
+        public void Logout()
         {
-            accountButton.WaitUntilVisible().Click();
-            exitAccountButton.WaitUntilVisible().Click();
+            accountButton.WaitUntilPresent().Click();
+            exitAccountButton.WaitUntilPresent().Click();
         }
 
     }

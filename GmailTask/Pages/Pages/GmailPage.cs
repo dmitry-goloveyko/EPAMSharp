@@ -19,10 +19,13 @@ namespace Pages
         [FindsBy(How = How.XPath, Using = "//span[contains(text(), 'More') and not(parent::div)]")]
         private IWebElement moreButton;
 
+        [FindsBy(How = How.PartialLinkText, Using = "Inbox")]
+        private IWebElement inboxCategoryButton;
+
         [FindsBy(How = How.PartialLinkText, Using = "Spam")]
         private IWebElement spamCategoryButton;
 
-        [FindsBy(How = How.XPath, Using = "//*[@aria-label='Settings']")]
+        [FindsBy(How = How.XPath, Using = "//*[@gh='s']/div")]
         private IWebElement settingsButton;
 
         [FindsBy(How = How.XPath, Using = "//div[@role='menuitem']/div[text() = 'Settings']")]
@@ -56,12 +59,30 @@ namespace Pages
 
         public void WriteLetter(String recipient, String subject, String text)
         {
-            composeEmailButton.Click();
+            composeEmailButton.WaitUntilPresent().Click();
+
             ComposeLetterWindow composeLetterWindow = new ComposeLetterWindow();
             composeLetterWindow.WriteLetter(recipient, subject, text);
         }
 
-        public IWebElement GetLetter(String senderEmail, String subjectPart, String messagePart)
+        public void WriteLetterWithEmoticons(String recipient, String subject, String text, List<String> emoticons)
+        {
+            composeEmailButton.WaitUntilPresent().Click();
+
+            ComposeLetterWindow composeLetterWindow = new ComposeLetterWindow();
+            composeLetterWindow.WriteLetterWithEmoticons(recipient, subject, text, emoticons);
+        }
+
+        public bool WriteLetterWithLargeFile(String recipient, String subject, String text, String absolutePath)
+        {
+            composeEmailButton.WaitUntilPresent().Click();
+
+            ComposeLetterWindow composeLetterWindow = new ComposeLetterWindow();
+
+            return composeLetterWindow.WriteLetterWithLargeFile(recipient, subject, text, absolutePath);
+        }
+
+        public IWebElement GetLetterWebElement(String senderEmail, String subjectPart, String messagePart)
         {
             int charactersToCompareStrings = 20;
             if (subjectPart.Length > charactersToCompareStrings)
@@ -88,7 +109,7 @@ namespace Pages
 
             if (letters.Count > 0)
             {
-                return letters[0];
+                return letters.First();
             }
 
             return null;
@@ -96,7 +117,7 @@ namespace Pages
 
         public void OpenLetter(String senderEmail, String subjectPart, String messagePart)
         {
-            IWebElement letter = GetLetter(senderEmail, subjectPart, messagePart);
+            IWebElement letter = GetLetterWebElement(senderEmail, subjectPart, messagePart);
             if (letter != null)
             {
                 letter.Click();
@@ -105,11 +126,9 @@ namespace Pages
 
         public void MarkLetter(IWebElement letter)
         {
-            String markDivXPath = "//div[@role='checkbox']/div";
-
             try
             {
-                letter.FindElement(By.XPath(markDivXPath)).Click();
+                letter.FindElement(By.XPath("//div[@role='checkbox']/div")).Click();
             }
             catch (NullReferenceException)
             {
@@ -117,85 +136,43 @@ namespace Pages
             }
         }
 
-        public void MarkAllLetters()
+        public void DeleteAllLetters()
         {
-            System.Threading.Thread.Sleep(1000);
-            try 
-            {
-                webDriver.FindElement(By.XPath("//div[@data-tooltip='Select']//div[@role='presentation']")).Click();
-            }
-            catch (ElementNotVisibleException)
-            {
-                Console.WriteLine("markAllLettersCheckbox not found");
-            }
+            markAllLettersCheckbox.WaitUntilPresent().Click();
+            deleteButton.WaitUntilPresent().Click();
         }
 
-        public void ClickReportSpamButton()
+        public void MoveLetterToSpam(String senderEmail, String subjectPart, String messagePart)
         {
-            System.Threading.Thread.Sleep(1000);
-
-            try
-            {
-                webDriver.FindElement(By.XPath("//div[@act='9']/div")).Click();
-            }
-            catch (ElementNotVisibleException)
-            {
-                Console.WriteLine("Element delete button is not visible");
-            }
-        }
-
-        public void ClickDeleteButton()
-        {
-            System.Threading.Thread.Sleep(1000);
-
-            try
-            {
-                webDriver.FindElement(By.XPath("//div[@act='10']/div")).Click();
-            }
-            catch (ElementNotVisibleException)
-            {
-                Console.WriteLine("Element delete button is not visible");
-            }
-        }
-
-        public void DeleteAllLettersInbox()
-        {
-            MarkAllLetters();
-            ClickDeleteButton();
+            IWebElement letter = GetLetterWebElement(senderEmail, subjectPart, messagePart);
+            MarkLetter(letter);
+            reportSpamButton.WaitUntilPresent().Click();
         }
 
         public void OpenSpam()
         {
-            moreButton.Click();
-
+            moreButton.WaitUntilPresent().Click();
             spamCategoryButton.WaitUntilVisible().Click();
+        }
+
+        public void OpenInbox()
+        {
+            inboxCategoryButton.WaitUntilPresent().Click();
         }
 
         public void DeleteAllSpam()
         {
             OpenSpam();
 
-            try
-            {
-                deleteAllSpamHyperlink.WaitUntilVisible().Click();
-                PageFactory.InitElements(webDriver, this);
-                okButton.WaitUntilVisible().Click();
-            }
-            catch (TimeoutException)
-            {
-                Console.WriteLine("No spam to delete");
-            }
+            deleteAllSpamHyperlink.WaitUntilPresent().Click();
+            okButton.WaitUntilPresent().Click();
         }
 
         public void OpenSettings()
         {
-            settingsButton.WaitUntilVisible().Click();
-            settingsMenuOption.WaitUntilVisible().Click();
+            settingsButton.WaitUntilPresent().Click();
+            settingsMenuOption.WaitUntilPresent().Click();
         }
 
-        public void ClickComposeEmailButton()
-        {
-            composeEmailButton.WaitUntilVisible().Click();
-        }
     }
 }
