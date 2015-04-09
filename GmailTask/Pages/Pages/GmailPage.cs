@@ -25,20 +25,26 @@ namespace Pages
         [FindsBy(How = How.PartialLinkText, Using = "Spam")]
         private IWebElement spamCategoryButton;
 
+        [FindsBy(How = How.PartialLinkText, Using = "AllMail")]
+        private IWebElement allMailCategoryButton;
+
         [FindsBy(How = How.XPath, Using = "//*[@gh='s']/div")]
         private IWebElement settingsButton;
 
         [FindsBy(How = How.XPath, Using = "//div[@role='menuitem']/div[text() = 'Settings']")]
         private IWebElement settingsMenuOption;
 
-        [FindsBy(How = How.XPath, Using = "//*[@data-tooltip='Report spam']/div/div")]
+        [FindsBy(How = How.XPath, Using = "//*[@act='9']")]
         private IWebElement reportSpamButton;
 
-        [FindsBy(How = How.XPath, Using = "//*[@data-tooltip='Delete']/div/div]")]
+        [FindsBy(How = How.XPath, Using = "//*[@act='10']")]
         private IWebElement deleteButton;
 
         [FindsBy(How = How.XPath, Using = "//div[@data-tooltip='Select']//div[@role='presentation']")]
         private IWebElement markAllLettersCheckbox;
+
+        [FindsBy(How = How.XPath, Using = "//*[@role='button' and text() = 'Not spam']")]
+        private IWebElement notSpamButton;
 
         [FindsBy(How = How.XPath, Using = "//span[text()='Delete all spam messages now']")]
         private IWebElement deleteAllSpamHyperlink;
@@ -149,6 +155,13 @@ namespace Pages
             reportSpamButton.WaitUntilPresent().Click();
         }
 
+        public void MoveLetterOutOfSpam(String senderEmail, String subjectPart, String messagePart)
+        {
+            IWebElement letter = GetLetterWebElement(senderEmail, subjectPart, messagePart);
+            MarkLetter(letter);
+            notSpamButton.WaitUntilPresent().Click();
+        }
+
         public void OpenSpam()
         {
             moreButton.WaitUntilPresent().Click();
@@ -158,6 +171,12 @@ namespace Pages
         public void OpenInbox()
         {
             inboxCategoryButton.WaitUntilPresent().Click();
+        }
+
+        public void OpenAllMail()
+        {
+            moreButton.WaitUntilPresent().Click();
+            allMailCategoryButton.WaitUntilPresent().Click();
         }
 
         public void DeleteAllSpam()

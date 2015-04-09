@@ -162,6 +162,36 @@ namespace Tests
             Utils.TakeScreenshot(file2);
 
             Assert.IsFalse(Utils.ImagesEqual(file1, file2));
+
+            File.Delete(file1);
+            File.Delete(file2);
+        }
+
+        [Test, Category("GM#1.11"), Description("Mark item as spam and mark spam item as not spam")]
+        public void spamMarking()
+        {
+            String user = user1.login;
+            String subject = "Letter";
+            String message = "Hello";
+
+            googleAccountsPage.OpenPage();
+            googleAccountsPage.Login(user, user1.password);
+
+            gmailPage.OpenPage();
+            gmailPage.WriteLetter(user, subject, message);
+            gmailPage.OpenInbox();
+            gmailPage.MoveLetterToSpam(user, subject, message);
+
+            gmailPage.OpenSpam();
+
+            Assert.IsNotNull(gmailPage.GetLetterWebElement(user, subject, message));
+
+            gmailPage.MoveLetterOutOfSpam(user, subject, message);
+
+            gmailPage.OpenInbox();
+
+            Assert.IsNotNull(gmailPage.GetLetterWebElement(user, subject, message));
+
         }
 
         //[TearDown]

@@ -17,7 +17,6 @@ namespace Driver
             fs.Seek(megabytes * 1024 * 1024, SeekOrigin.Begin);
             fs.WriteByte(0);
             fs.Close();
-
         }
 
         public static bool ElementIsUnique(String xpath)
@@ -48,8 +47,14 @@ namespace Driver
 
         public static bool ImagesEqual(String file1, String file2)
         {
-            Bitmap bmp1 = new Bitmap(file1);
-            Bitmap bmp2 = new Bitmap(file2);
+            FileStream fs1 = new FileStream(file1, FileMode.Open);
+            FileStream fs2 = new FileStream(file2, FileMode.Open);
+
+            Bitmap bmp1 = new Bitmap(fs1);
+            Bitmap bmp2 = new Bitmap(fs2);
+
+            fs1.Close();
+            fs2.Close();
 
             Color pix1 = new Color();
             Color pix2 = new Color();
@@ -73,15 +78,16 @@ namespace Driver
                 }
             }
 
-            return false;
+            return equal;
         }
 
-        public static void TakeScreenshot(String fileToSave)
+        public static void TakeScreenshot(String filePath)
         {
             System.Threading.Thread.Sleep(10000);
 
             Screenshot ss = ((ITakesScreenshot)Driver.getDriver()).GetScreenshot();
-            ss.SaveAsFile(fileToSave, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+            File.WriteAllBytes(filePath, ss.AsByteArray);
         }
     }
 }
