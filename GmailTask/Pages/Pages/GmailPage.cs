@@ -22,6 +22,9 @@ namespace Pages
         [FindsBy(How = How.PartialLinkText, Using = "Inbox")]
         private IWebElement inboxCategoryButton;
 
+        [FindsBy(How = How.PartialLinkText, Using = "Starred")]
+        private IWebElement starredCategoryButton;
+
         [FindsBy(How = How.PartialLinkText, Using = "Spam")]
         private IWebElement spamCategoryButton;
 
@@ -142,6 +145,18 @@ namespace Pages
             }
         }
 
+        public void StarLetter(IWebElement letter)
+        {
+            try
+            {
+                letter.FindElement(By.XPath("//span[@title='Not starred']")).Click();
+            }
+            catch (NullReferenceException)
+            {
+                Console.WriteLine("Letter does not exist in this folder");
+            }
+        }
+
         public void DeleteAllLetters()
         {
             markAllLettersCheckbox.WaitUntilPresent().Click();
@@ -173,6 +188,11 @@ namespace Pages
             inboxCategoryButton.WaitUntilPresent().Click();
         }
 
+        public void OpenStarred()
+        {
+            starredCategoryButton.WaitUntilPresent().Click();
+        }
+
         public void OpenAllMail()
         {
             moreButton.WaitUntilPresent().Click();
@@ -193,5 +213,9 @@ namespace Pages
             settingsMenuOption.WaitUntilPresent().Click();
         }
 
+        public void ClickComposeButton()
+        {
+            composeEmailButton.WaitUntilPresent().Click();
+        }
     }
 }

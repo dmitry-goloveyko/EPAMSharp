@@ -87,6 +87,11 @@ namespace Pages
             sendEmailButton.Click();
         }
 
+        public bool verifySignature(String signature)
+        {
+            return textInput.Text.Contains(signature);
+        }
+
         private bool AttachFile(String absolutePath)
         {
             attachFilesButton.WaitUntilPresent().Click();
@@ -128,5 +133,7 @@ namespace Pages
 
             insertEmoticonsToTextareaButton.WaitUntilPresent().Click();
         }
+    
+
     }
 }

@@ -76,19 +76,6 @@ namespace Tests
         }
 
 
-        //[Test]
-        //public void Test2()
-        //{
-        //    googleAccountsPage.OpenPage();
-        //    googleAccountsPage.Login(user2.login, user2.password);
-        //    gmailPage.OpenPage();
-        //    gmailPage.OpenSettings();
-
-        //    //redirect to settings page
-        //    GmailSettingsPage settingsPage = new GmailSettingsPage();
-        //    settingsPage.
-        //}
-
         [Test, Category("GM#1.3"), Description("User can't send email with file over 25mb")]
         public void sendingEmailWithFileOver25Mb()
         {
@@ -103,13 +90,9 @@ namespace Tests
             bool emailSent = gmailPage.WriteLetterWithLargeFile(user1.login, "theme", "Hello", file);
 
             Assert.IsFalse(emailSent);
+
+            File.Delete(file);
         }
-
-        //[Test]
-        //public void Test4()
-        //{
-
-        //}
 
         [Test, Category("GM#1.5"), Description("Sending mail with emoticons")]
         public void oneCanSendMailWithEmoticons()
@@ -192,6 +175,51 @@ namespace Tests
 
             Assert.IsNotNull(gmailPage.GetLetterWebElement(user, subject, message));
 
+        }
+
+        [Test, Category("GM#1.12"), Description("Setting signature")]
+        public void settingSignature()
+        {
+            String user = user1.login;
+            String signatureText = "my signature";
+
+            googleAccountsPage.OpenPage();
+            googleAccountsPage.Login(user, user1.password);
+
+            gmailPage.OpenPage();
+            gmailPage.OpenSettings();
+
+            TabGeneralPage tabGeneralPage = new TabGeneralPage();
+            tabGeneralPage.setSignature(signatureText);
+
+            gmailPage.OpenInbox();
+
+            gmailPage.ClickComposeButton();
+
+            ComposeLetterWindow composeLetterWindow = new ComposeLetterWindow();
+            Assert.IsTrue(composeLetterWindow.verifySignature(signatureText));
+        }
+
+        [Test, Category("GM#1.13"), Description("Check 'star' selection")]
+        public void starringLetter()
+        {
+            String user = user1.login;
+            String subject = "Letter";
+            String message = "Hello";
+
+            googleAccountsPage.OpenPage();
+            googleAccountsPage.Login(user, user1.password);
+
+            gmailPage.OpenPage();
+            gmailPage.WriteLetter(user, subject, message);
+
+            gmailPage.OpenInbox();
+            IWebElement letter = gmailPage.GetLetterWebElement(user, subject, message);
+            gmailPage.StarLetter(letter);
+
+            gmailPage.OpenStarred();
+
+            Assert.IsNotNull(gmailPage.GetLetterWebElement(user, subject, message));
         }
 
         //[TearDown]
