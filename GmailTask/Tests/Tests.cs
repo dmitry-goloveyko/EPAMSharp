@@ -121,7 +121,7 @@ namespace Tests
             Assert.IsTrue(letterVerified);
         }
 
-        [Test, Category("GM#1.7"), Description("Changing decoration theme")]
+        [Test, Category("GM#1.6"), Description("Changing decoration theme")]
         public void oneCanChangeDecorationTheme()
         {
             googleAccountsPage.OpenPage();
