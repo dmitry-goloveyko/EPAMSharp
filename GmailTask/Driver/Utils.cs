@@ -23,26 +23,12 @@ namespace Driver
         {
             List<IWebElement> elements = Driver.getDriver().FindElements(By.XPath(xpath)).ToList();
 
-            if (elements.Count == 1)
-            {
-                return true;
-            }
-
-            return false;
+            return elements.Count == 1;
         }
 
         public static bool ElementIsPresent(String xpath)
         {
-            try
-            {
-                Driver.getDriver().FindElement(By.XPath(xpath));
-            }
-            catch (NoSuchElementException)
-            {
-                return false;
-            }
-
-            return true;
+            return Driver.getDriver().FindElements(By.XPath(xpath)).Count > 0;
         }
 
         public static bool ImagesEqual(String file1, String file2)
