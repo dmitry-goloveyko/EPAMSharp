@@ -148,6 +148,8 @@ namespace Tests
 
             File.Delete(file1);
             File.Delete(file2);
+
+            gmailPage.Logout();
         }
 
         [Test, Category("GM#1.11"), Description("Mark item as spam and mark spam item as not spam")]
@@ -220,6 +222,14 @@ namespace Tests
             gmailPage.OpenStarred();
 
             Assert.IsNotNull(gmailPage.GetLetterWebElement(user, subject, message));
+        }
+
+        [TearDown]
+        public void CleanUp()
+        {
+            Console.WriteLine("Teardown");
+            gmailPage.Logout();
+            Console.WriteLine("Log out");
         }
 
         //[TearDown]

@@ -19,7 +19,9 @@ namespace Pages
 
         public void Logout()
         {
+            Console.WriteLine(accountButton.GetAttribute("InnerHTML"));
             accountButton.WaitUntilPresent().Click();
+            Console.WriteLine(exitAccountButton.GetAttribute("InnerHTML"));
             exitAccountButton.WaitUntilPresent().Click();
         }
 
